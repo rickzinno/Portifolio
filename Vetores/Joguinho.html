@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo da Forca</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #020111;
+            color: #00d9ff;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #palavra {
+            font-size: 2em;
+            letter-spacing: 10px;
+            margin: 20px 0;
+        }
+
+        #letras button {
+            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background: #00d9ff;
+            color: black;
+            font-weight: bold;
+        }
+
+        #letras button:hover {
+            background: white;
+        }
+
+        #mensagem {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #ff5555;
+        }
+
+        #forca {
+            margin: 30px auto;
+            width: 150px;
+            height: 250px;
+            position: relative;
+        }
+
+        .parte {
+            display: none;
+            position: absolute;
+            background-color: white;
+        }
+
+        /* Estrutura da forca */
+        #base {
+            width: 150px;
+            height: 10px;
+            bottom: 0;
+            left: 0;
+        }
+
+        #poste {
+            width: 10px;
+            height: 250px;
+            bottom: 0;
+            left: 50px;
+        }
+
+        #trave {
+            width: 100px;
+            height: 10px;
+            top: 0;
+            left: 50px;
+        }
+
+        #corda {
+            width: 2px;
+            height: 30px;
+            top: 10px;
+            left: 145px;
+            background-color: #fff;
+        }
+
+        /* Boneco */
+        #cabeca {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            top: 40px;
+            left: 130px;
+            background-color: #fff;
+        }
+
+        #corpo {
+            width: 4px;
+            height: 70px;
+            top: 70px;
+            left: 144px;
+            background-color: #fff;
+        }
+
+        #bracoEsq {
+            width: 4px;
+            height: 40px;
+            top: 80px;
+            left: 144px;
+            transform: rotate(-45deg);
+            transform-origin: top;
+            background-color: #fff;
+        }
+
+        #bracoDir {
+            width: 4px;
+            height: 40px;
+            top: 80px;
+            left: 144px;
+            transform: rotate(45deg);
+            transform-origin: top;
+            background-color: #fff;
+        }
+
+        #pernaEsq {
+            width: 4px;
+            height: 50px;
+            top: 140px;
+            left: 144px;
+            transform: rotate(-30deg);
+            transform-origin: top;
+            background-color: #fff;
+        }
+
+        #pernaDir {
+            width: 4px;
+            height: 50px;
+            top: 140px;
+            left: 144px;
+            transform: rotate(30deg);
+            transform-origin: top;
+            background-color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎯 Jogo da Forca</h1>
+
+    <div id="forca">
+        <div id="base" class="parte"></div>
+        <div id="poste" class="parte"></div>
+        <div id="trave" class="parte"></div>
+        <div id="corda" class="parte"></div>
+        <div id="cabeca" class="parte"></div>
+        <div id="corpo" class="parte"></div>
+        <div id="bracoEsq" class="parte"></div>
+        <div id="bracoDir" class="parte"></div>
+        <div id="pernaEsq" class="parte"></div>
+        <div id="pernaDir" class="parte"></div>
+    </div>
+
+    <div id="palavra"></div>
+    <div id="letras"></div>
+    <div id="mensagem"></div>
+
+    <script>
+        const palavraSecreta = "TECNOLOGIA";
+        let palavraAtual = Array(palavraSecreta.length).fill("_");
+        let erros = 0;
+        const maxErros = 10; // número de partes do boneco
+
+        const palavraDiv = document.getElementById("palavra");
+        const letrasDiv = document.getElementById("letras");
+        const mensagemDiv = document.getElementById("mensagem");
+        const partes = document.querySelectorAll(".parte");
+
+        function atualizarPalavra() {
+            palavraDiv.textContent = palavraAtual.join(" ");
+        }
+
+        function criarTeclado() {
+            const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for (let letra of letras) {
+                const btn = document.createElement("button");
+                btn.textContent = letra;
+                btn.onclick = () => verificarLetra(letra, btn);
+                letrasDiv.appendChild(btn);
+            }
+        }
+
+        function verificarLetra(letra, btn) {
+            btn.disabled = true;
+            let acertou = false;
+            for (let i = 0; i < palavraSecreta.length; i++) {
+                if (palavraSecreta[i] === letra) {
+                    palavraAtual[i] = letra;
+                    acertou = true;
+                }
+            }
+            if (!acertou) {
+                partes[erros].style.display = "block"; // mostra parte do boneco
+                erros++;
+            }
+            atualizarPalavra();
+            checarFim();
+        }
+
+        function checarFim() {
+            if (!palavraAtual.includes("_")) {
+                mensagemDiv.textContent = "🎉 Parabéns! Você ganhou!";
+                bloquearTeclado();
+            } else if (erros >= maxErros) {
+                mensagemDiv.textContent = "💀 Você perdeu! A palavra era: " + palavraSecreta;
+                bloquearTeclado();
+            }
+        }
+
+        function bloquearTeclado() {
+            const botoes = document.querySelectorAll("#letras button");
+            botoes.forEach(btn => btn.disabled = true);
+        }
+
+        atualizarPalavra();
+        criarTeclado();
+    </script>
+
+</body>
+
+</html>
